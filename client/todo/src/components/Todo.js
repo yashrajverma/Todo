@@ -1,20 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { BASE_URL } from "../env";
 const Todo = () => {
-  const [name, setName] = useState("");
-  const [task, setTask] = useState("");
-  const [status, setStatus] = useState("");
-  const [time_to_complete, setTimeToComplete] = useState("");
+  const name = useRef();
+  const task = useRef();
+  const status = useRef();
+  const time_to_complete = useRef();
+  // const [name, setName] = useState("");
+  // const [task, setTask] = useState("");
+  // const [status, setStatus] = useState("");
+  // const [time_to_complete, setTimeToComplete] = useState("");
   const [response, setResponse] = useState("");
   const [server_res, setServerResponse] = useState(false);
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     const data = {
-      name,
-      task,
-      status,
-      time_to_complete,
+      name: name.current.value,
+      task: task.current.value,
+      status: status.current.value,
+      time_to_complete: time_to_complete.current.value,
     };
-    console.log(data);
+    console.log("Data before submitting", data);
     window.location.reload(false);
     fetch(BASE_URL + "/create", {
       method: "POST",
@@ -23,7 +28,7 @@ const Todo = () => {
     })
       .then((res) => res.json())
       .then((result) => {
-        console.log("result", result);
+        // console.log("result", result);
         setServerResponse(!server_res);
         setResponse(result.message);
       })
@@ -35,7 +40,7 @@ const Todo = () => {
   return (
     <>
       <div className="container-fluid">
-        <form onSubmit={handleSubmit}>
+        <div>
           <div class="mb-3">
             <label for="name" class="form-label">
               Name
@@ -47,10 +52,11 @@ const Todo = () => {
               id="name"
               aria-describedby="nameHelp"
               placeholder="Name"
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value);
-              }}
+              // value={name.current.value}
+              ref={name}
+              // onChange={(e) => {
+              //   setName(e.target.value);
+              // }}
             />
           </div>
           <div class="mb-3">
@@ -63,10 +69,11 @@ const Todo = () => {
               id="task"
               aria-describedby="taskHelp"
               placeholder="task"
-              value={task}
-              onChange={(e) => {
-                setTask(e.target.value);
-              }}
+              // value={task.current.value}
+              ref={task}
+              // onChange={(e) => {
+              //   setTask(e.target.value);
+              // }}
               required
             />
           </div>
@@ -75,16 +82,26 @@ const Todo = () => {
               id="status"
               class="form-select"
               aria-label="Default select example"
-              onChange={(e) => {
-                setStatus(e.target.value);
-              }}
+              ref={status}
+              // value={status.current.value}
+              // onChange={(e) => {
+              //   setStatus(e.target.value);
+              // }}
               required
             >
               <option selected>Status</option>
-              <option value="Done">Done</option>
-              <option value="Pending">Pending</option>
-              <option value="Missed">Missed</option>
-              <option value="Canceled">Canceled</option>
+              <option value="Done" className="bg-success">
+                Done
+              </option>
+              <option value="Pending" className="bg-warning">
+                Pending
+              </option>
+              <option value="Missed" className="bg-danger">
+                Missed
+              </option>
+              <option value="Canceled" className="bg-danger">
+                Canceled
+              </option>
             </select>
           </div>
           <div class="mb-3">
@@ -98,10 +115,12 @@ const Todo = () => {
               id="time_to_complete"
               aria-describedby="time_to_complete"
               placeholder="Time To Complete"
-              value={time_to_complete}
-              onChange={(e) => {
-                setTimeToComplete(e.target.value);
-              }}
+              // value={time_to_complete}
+              ref={time_to_complete}
+              min={new Date().toISOString().split("T")[0]}
+              // onChange={(e) => {
+              //   setTimeToComplete(e.target.value);
+              // }}
             />
           </div>
 
@@ -110,11 +129,11 @@ const Todo = () => {
             // onClick={() => {
             //   handleSubmit();
             // }}
-            type="submit"
+            onClick={(e) => handleSubmit(e)}
           >
             Submit
           </button>
-        </form>
+        </div>
 
         {server_res ? response : null}
       </div>
